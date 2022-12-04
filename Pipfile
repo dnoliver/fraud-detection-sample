@@ -1,0 +1,29 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+numpy = "==1.23.0"
+pandas = "==1.3.5"
+matplotlib = "==3.2.2"
+seaborn = "==0.11.2"
+scikit-learn = "==1.0.0"
+graphviz = "==0.19.1"
+xgboost = "==1.5.1"
+imbalanced-learn = "==0.8.1"
+torch = "==1.12.0"
+skorch = "*"
+jupyterlab = "*"
+ipywidgets = "*"
+
+[dev-packages]
+nbconvert = "*"
+pylint = "*"
+black = "*"
+isort = "*"
+nbqa = "*"
+mdformat = "*"
+
+[requires]
+python_version = "3.10"
