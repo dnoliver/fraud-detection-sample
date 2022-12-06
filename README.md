@@ -51,7 +51,7 @@ pipenv shell
 
 isort --profile=black *.py
 black *.py
-pylint *.py
+pylint -E *.py
 
 nbqa isort --profile=black *.ipynb
 nbqa black *.ipynb

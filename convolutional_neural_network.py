@@ -4,6 +4,7 @@ Module: Convolutional Neural Network
 
 import datetime
 import os
+import pickle
 import random
 import time
 from pathlib import Path
@@ -16,6 +17,8 @@ from skorch import NeuralNetClassifier
 
 from utils import (
     card_precision_top_k_custom,
+    get_performances_plots,
+    get_summary_performances,
     get_train_test_set,
     model_selection_wrapper,
     read_from_files,
@@ -523,7 +526,7 @@ def main():
 
     parameters = {
         "clf__lr": [0.001],
-        "clf__batch_size": [256],
+        "clf__batch_size": [64, 128],
         "clf__max_epochs": [20],
         "clf__module__hidden_size": [500],
         "clf__module__num_conv": [2],
@@ -570,9 +573,68 @@ def main():
 
     performances_df_cnn = performances_df
 
-    print(performances_df_cnn)
-    print(execution_time_cnn)
+    execution_times = [execution_time_cnn]
+
+    summary_performances_cnn = get_summary_performances(
+        performances_df_cnn, parameter_column_name="Parameters summary"
+    )
+
+    parameters_dict = dict(performances_df_cnn["Parameters"])
+    performances_df_cnn["Parameters summary"] = [
+        str(parameters_dict[i]["clf__max_epochs"])
+        + "/"
+        + str(parameters_dict[i]["clf__batch_size"])
+        + "/"
+        + str(parameters_dict[i]["clf__module__num_filters"])
+        for i in range(len(parameters_dict))
+    ]
+
+    summary_performances_cnn_subset = get_summary_performances(
+        performances_df_cnn, parameter_column_name="Parameters summary"
+    )
+    indexes_summary = summary_performances_cnn_subset.index.values
+    indexes_summary[0] = "Best estimated parameters"
+    summary_performances_cnn_subset.rename(
+        index=dict(zip(np.arange(len(indexes_summary)), indexes_summary))
+    )
+    get_performances_plots(
+        performances_df_cnn,
+        performance_metrics_list=["AUC ROC", "Average precision", "Card Precision@100"],
+        expe_type_list=["Test", "Validation"],
+        expe_type_color_list=["#008000", "#FF0000"],
+        parameter_name="batch size",
+        summary_performances=summary_performances_cnn_subset,
+    )
+
+    parameters_dict = dict(performances_df_cnn["Parameters"])
+    performances_df_cnn["Parameters summary"] = [
+        str(parameters_dict[i]["clf__max_epochs"])
+        + "/"
+        + str(parameters_dict[i]["clf__module__num_conv"])
+        + "/"
+        + str(parameters_dict[i]["clf__batch_size"])
+        + "/"
+        + str(parameters_dict[i]["clf__module__num_filters"])
+        + "/"
+        + str(parameters_dict[i]["clf__module__p"])
+        for i in range(len(parameters_dict))
+    ]
+
+    performances_df_dictionary = {"Convolutional Neural Network": performances_df_cnn}
+
+    execution_times = [execution_time_cnn]
+
+    DIR_OUTPUT = (
+        Path(__file__).parent
+        / "performances_model_selection_convolutional_neural_network.pkl"
+    )
+    filehandler = open(DIR_OUTPUT, "wb")
+    pickle.dump((performances_df_dictionary, execution_times), filehandler)
+    filehandler.close()
+
     print("Convolutional Neural Network Done")
+
+    return (performances_df_cnn, execution_times, summary_performances_cnn)
 
 
 if __name__ == "__main__":

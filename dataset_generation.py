@@ -300,6 +300,8 @@ def main():
 
     print("Dataset Generation Done")
 
+    return transactions_df
+
 
 if __name__ == "__main__":
     main()

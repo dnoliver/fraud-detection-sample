@@ -164,6 +164,7 @@ def main():
     transactions_df = transform_dataset(transactions_df)
     save_transformed_dataset(transactions_df)
     print("Feature Transformation Done")
+    return transactions_df
 
 
 if __name__ == "__main__":
